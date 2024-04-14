@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #board {
+            display: grid;
+            grid-template-columns: repeat(25, 1fr);
+            grid-template-rows: repeat(25, 1fr);
+            gap: 5px;
+            width: 1000px;
+            height: 1000px;
+        }
+
+        .cell {
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1em;
+        }
+
+        .wall {
+            background-color: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="board"></div>
+
+    <script>
+        var board = document.getElementById('board');
+        var cells = [];
+        for (var i = 0; i < 625; i++) {
+            var cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.draggable = true;
+            cell.addEventListener('dragstart', function (event) {
+                event.dataTransfer.setData('text/plain', cells.indexOf(this));
+            });
+            cell.addEventListener('dragover', function (event) {
+                event.preventDefault();
+            });
+            cell.addEventListener('drop', function (event) {
+                event.preventDefault();
+                var fromIndex = event.dataTransfer.getData('text/plain');
+                var toIndex = cells.indexOf(this);
+                if (!this.className.includes('wall') && cells[fromIndex].textContent === 'X') {
+                    cells[fromIndex].textContent = '';
+                    this.textContent = 'X';
+                }
+            });
+            board.appendChild(cell);
+            cells.push(cell);
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        var placedPieces = 0;
+        while (placedPieces < 6) {
+            var index = getRandomInt(0, 624);
+            if (!cells[index].textContent &&
+                !(cells[index - 1] && cells[index - 1].textContent) &&
+                !(cells[index + 1] && cells[index + 1].textContent) &&
+                !(cells[index - 25] && cells[index - 25].textContent) &&
+                !(cells[index + 25] && cells[index + 25].textContent) &&
+                !cells[index].className.includes('wall')) {
+                cells[index].textContent = 'X';
+                placedPieces++;
+            }
+        }
+
+        var placedWalls = 0;
+        while (placedWalls < 10) {
+            var index = getRandomInt(0, 624);
+            var canPlaceWall = true;
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 4; j++) {
+                    if (index + i + j * 25 < 625 && cells[index + i + j * 25].className.includes('wall')) {
+                        canPlaceWall = false;
+                        break;
+                    }
+                }
+                if (!canPlaceWall) {
+                    break;
+                }
+            }
+            if (canPlaceWall) {
+                for (var i = -2; i < 5; i++) {
+                    for (var j = -2; j < 6; j++) {
+                        if (index + i + j * 25 >= 0 && index + i + j * 25 < 625 && cells[index + i + j * 25].className.includes('wall')) {
+                            canPlaceWall = false;
+                            break;
+                        }
+                    }
+                    if (!canPlaceWall) {
+                        break;
+                    }
+                }
+            }
+            if (canPlaceWall) {
+                for (var i = 0; i < 3; i++) {
+                    for (var j = 0; j < 4; j++) {
+                        if (index + i + j * 25 < 625 && !cells[index + i + j * 25].textContent) {
+                            cells[index + i + j * 25].className += ' wall';
+                        }
+                    }
+                }
+                placedWalls++;
+            }
+        }
+    </script>
+</body>
+
+</html>
