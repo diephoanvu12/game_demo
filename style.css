@@ -1,0 +1,19 @@
+.chessboard {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+    height: 400px;
+}
+
+.square {
+    width: calc(100% / 8);
+    height: calc(100% / 8);
+}
+
+.team1 {
+    background-color: #ffce9e;
+}
+
+.team2 {
+    background-color: #d18b47;
+}
